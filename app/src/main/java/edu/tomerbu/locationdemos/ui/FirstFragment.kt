@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import edu.tomerbu.locationdemos.R
 import edu.tomerbu.locationdemos.databinding.FragmentFirstBinding
 import edu.tomerbu.locationdemos.work.DemoWorker
+import edu.tomerbu.locationdemos.work.MyWorker
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -37,12 +37,21 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.buttonFirst.setOnClickListener {
-            val request = OneTimeWorkRequestBuilder<DemoWorker>().build()
-            WorkManager.getInstance(requireContext()).enqueue(request)
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .setRequiresCharging(true)
+                .build()
+
+            val request = OneTimeWorkRequestBuilder<MyWorker>()
+                .setConstraints(constraints)
+                .build()
+
+            WorkManager.getInstance(requireContext())
+                .enqueue(request)
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
